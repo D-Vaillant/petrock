@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "petrock"
+version = "0.1.0"
+description = "A pet rock."
+authors = ["David Vaillant <dnv2011@nyu.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+transformers = "^4.40.1"
+torchvision = "^0.18.0"
+einops = "^0.7.0"
+guidance = "^0.1.13"
+
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.24.0"
+notebook = "^7.1.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
