@@ -6,6 +6,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+# TODO: Add in some code to see how long this takes.
+# TODO: Refactor to use some testing framework. Pytest or Unittest, I guess.
 def test_classifier():
     classes = ['cat', 'dog']
     for animal in classes:
