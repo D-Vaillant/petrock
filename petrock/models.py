@@ -1,23 +1,39 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from PIL import Image
+from pathlib import Path
 
-model_id = "vikhyatk/moondream2"
-revision = "2024-04-02"
-model = AutoModelForCausalLM.from_pretrained(
-    model_id, trust_remote_code=True, revision=revision
-)
+# Guidance
+from guidance import image, user, assistant, gen, models
 
-tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
 
-# def prompt_model
-def prompt_image(image: Image,
-                 prompt: str='Describe this image.') -> str:
-    enc_image = model.encode_image(image)
-    return model.answer_question(enc_image, prompt, tokenizer)
+using = 'llamacpp'
+
+# Moondream.
+ggufs = list(Path('models').glob("*.gguf"))  # List of GGUF files.
+model_zoo = {"llama3_iq3": "Meta-Llama-3-8B-Instruct-IQ3_XXS.gguf"}
+
+if using == 'moondream':
+    from llama_cpp import Llama
+    from llama_cpp.llama_chat_format import Llava15ChatHandler
+
+    chat_handler = Llava15ChatHandler(clip_model_path="models/moondream2-mmproj-f16.gguf")
+    llm = Llama(
+      model_path="models//moondream2-text-model-f16.gguf",
+      chat_handler=chat_handler,
+      n_ctx=2048,
+      logits_all=True,# needed to make llava work
+      n_gpu_layers=-1
+    )
+    lm = models.LlamaCppChat(llm)
+elif using == 'llamacpp':
+    # TODO: Model zoo.
+    model_name = 'llama3_iq3'
+    lm = models.LlamaCppChat(f"models/{model_zoo[model_name]}")
 
 
 if __name__ == "__main__":
-    lm += "What color is made by mixing red and blue? "
-    print(lm)
-    # image = Image.open('images/dog.jpg')
-    # print(prompt_image(image))
+    with user():
+        lm += "If you dream, what's next?"
+    with assistant():
+        lm += gen(stop='.', name='answer', max_tokens=25)
+    print(lm['answer'])

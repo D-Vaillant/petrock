@@ -6,6 +6,10 @@ Use poetry.
 
 `poetry install`
 
+### Ollama
+
+`curl -fsSL https://ollama.com/install.sh | sh`
+
 ### Camera_setup, openCV, tensorflow lite
 
 sudo apt install -y python3-picamera2

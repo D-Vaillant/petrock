@@ -10,8 +10,11 @@ python = "^3.11"
 transformers = "^4.40.1"
 torchvision = "^0.18.0"
 einops = "^0.7.0"
-# guidance = "^0.1.13"
-
+guidance = "^0.1.13"
+litellm = "^1.35.32"
+llama-cpp-python = "^0.2.68"
+# for Raspberry Pi
+# llama-cpp-python = { file = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.68/llama_cpp_python-0.2.68-cp311-cp311-linux_aarch64.whl" }
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.24.0"
