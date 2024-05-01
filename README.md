@@ -1,14 +1,12 @@
 # petrock
 Make your Raspberry Pi, into a pet rock. That can see.
 
-## Setup
+## Developer Setup
 Use poetry.
 
-`poetry install`
+`poetry install --with=dev`
 
-### Ollama
-
-`curl -fsSL https://ollama.com/install.sh | sh`
+Right now we're running `llama.cpp` with `guidance` as the LLM interface. `llama.cpp` should be installed with poetry.
 
 ### Camera_setup, openCV, tensorflow lite
 
@@ -45,7 +43,19 @@ cv2.__version__
 
 //INSTALL COMPLETE! openCV v.4.9.0
 
-## Troubleshooting
-`export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring`
+## Deployment
+This assumes you're using Raspbian Lite, circa 2024-05-01. Adjust parameters as you need.
 
-This fixes an issue.
+First, you need poetry:
+`sudo apt install python3-poetry`
+
+Then:
+`poetry install --with=pi`
+
+Run the script in `models` to download the models.
+This will set up the poetry virtual environment. To serve a WebUI, do TODO: WRITE THIS.
+
+### Troubleshooting
+Sometimes you'll run into a DBus error when trying to use `poetry`. Do this, and `source ~/.bashrc`, and things should work properly.
+`echo "export PYTHON_KEYRING_BACKEND=keyring.backends.fail.Keyring" >> ~/.bashrc`
+
