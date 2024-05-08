@@ -1,5 +1,5 @@
 from PIL import Image
-
+import llms
 
 class Webcam:
     def get_image(self) -> Image:
@@ -28,5 +28,7 @@ class Vision:
         return baked_img
     
     def caption_image(self, image: Image) -> str:
+        moondream = llms.summon_moondream()
         # invoke Moondream here.
+        
         return caption
