@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 import logging
+import json
+
 
 import dotenv
 from PIL import Image
@@ -86,9 +88,14 @@ def predict(llm, system_msg,
             yield text
 
 def get_model_zoo():
-    ggufs = Path(model_dir).glob("*/*/*.gguf")  # List of GGUF files.
-    model_zoo = {g.stem: g for g in ggufs}
-    return model_zoo
+    with open("petrock/server_config.json") as serverconfig_file:
+        server_config = json.load(serverconfig_file)
+
+    model_arr = server_config['models']
+    zoo = {m['model_alias']: m for m in model_arr}
+    for k in zoo:
+        del zoo[k]['model_alias']
+    return zoo
 
 
 def print_model_zoo():
