@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import logging
 
 import dotenv
 from PIL import Image
@@ -14,6 +15,7 @@ model_dir = os.getenv("MODEL_ZOO", 'models/')
 def get_model(model_name: str,
               n_ctx: int = 2048,
               **llama_kwargs) -> Llama:
+    logging.debug(f"Retrieving {model_name}.")
     zoo = get_model_zoo()
     try:
         model_path: Path = zoo[model_name]
@@ -25,6 +27,7 @@ def get_model(model_name: str,
                  **llama_kwargs)
 
 def get_moondream() -> Llama:
+    logging.debug(f"Retrieving Moondream OpenAI object.")
     chat_handler = Llava15ChatHandler(clip_model_path=f"{model_dir}/moondream2-mmproj-f16.gguf")
     llm = Llama(
         model_path=f"{model_dir}/moondream2-text-model-f16.gguf",
@@ -47,13 +50,40 @@ def describe_image(llm: Llama, data_uri):
 
 def prompt_llm(llm: Llama,
                system_msg: str = "You are a pet rock.",
-               messages: list[dict] = None):
+               role: str = 'user',
+               message: str = ''):
     system = {"role": "system", "content": system_msg}
-    if messages is None:
-        messages = dict()
-    r = llm.create_chat_completion(messages=system + messages)
+    prompt = {"role": role, "content": message}
+    # user_reply["content"] = {"type": "text", "text": message}
+
+    r = llm.create_chat_completion(messages=[system, prompt])
     return r
 
+def predict(llm, system_msg,
+            message, history=None,
+            **llm_kwargs):
+    messages = [{"role": "system", "content": system_msg}]
+
+    if history is None:
+        history = []
+    for user_message, assistant_message in history:
+        messages.append({"role": "user", "content": user_message})
+        messages.append({"role": "assistant", "content": assistant_message})
+    
+    messages.append({"role": "user", "content": message})
+
+    response = llm.create_chat_completion(
+        messages=messages,
+        # stream=True,
+        **llm_kwargs
+    )
+    return response
+    text = ""
+    for chunk in response:
+        content = chunk.choices[0].delta.content
+        if content:
+            text += content
+            yield text
 
 def get_model_zoo():
     ggufs = Path(model_dir).glob("*/*/*.gguf")  # List of GGUF files.

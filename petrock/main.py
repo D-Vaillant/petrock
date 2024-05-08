@@ -1,3 +1,6 @@
+import logging
+
+
 import guidance
 from guidance import system, user, assistant, gen
 from entities import Personality, Petrock
@@ -38,9 +41,11 @@ def invoke(llm, entity, prompt, **kwargs):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     llm = summon_llm("llama3", echo=False)
 
-    for i in range(5):
+    for i in range(3):
+        logging.info(f"Invoking Rocky to ask about its day, #{i}.")
         llm += invoke(rocky, "How's your day?")
 
         print(f"#{i+1}: {llm['latest_response'] + llm['stop']}")
