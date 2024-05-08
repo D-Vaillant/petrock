@@ -5,7 +5,7 @@
         {
             "model": "models/Meta-Llama-3-8B-Instruct-IQ3_XXS.gguf",
             "model_alias": "llama3",
-            "chat_format": "chatml",
+            "chat_format": "llama-3",
             "n_gpu_layers": -1,
             "offload_kqv": true,
             "n_threads": 4,
