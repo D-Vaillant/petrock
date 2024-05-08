@@ -1,7 +1,7 @@
 import guidance
 from guidance import system, user, assistant, gen
 from entities import Personality, Petrock
-from vision import Vision
+from vision import Vision, OpenCVWebcam
 from llms import summon_llm
 
 rp_system = "Roleplay according to the description, without breaking character for any reason whatsoever. Answer briefly and only in dialogue. "
@@ -39,8 +39,14 @@ def invoke(llm, entity, prompt, **kwargs):
 
 if __name__ == "__main__":
     llm = summon_llm("llama3", echo=False)
+    webcam = OpenCVWebcam()
+    sight = Vision(device=webcam)
+    rocky = Petrock(persona=irascible, capacities=[sight, Echo()])
+    llm = summon_llm("llama3", echo=False)
+    image = sight.use_webcam()
+    caption = sight.caption_image(image)
 
     for i in range(5):
-        llm += invoke(rocky, "How's your day?")
+        llm += invoke(rocky, f"Caption: {caption}. How's your day?")
 
         print(f"#{i+1}: {llm['latest_response'] + llm['stop']}")
