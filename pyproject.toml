@@ -12,11 +12,20 @@ torchvision = "^0.18.0"
 einops = "^0.7.0"
 guidance = "^0.1.13"
 # for Raspberry Pi
-llama-cpp-python = {extras = ["server"], version = "^0.2.69"}
+llama-cpp-python = [
+		{ platform = "aarch64", extras = ["server"], version = "^0.2.69"},
+		{ platform = "aarch64", extras = ["server"], url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.69/llama_cpp_python-0.2.69-cp311-cp311-linux_aarch64.whl" }
+		]
+
+
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.24.0"
 notebook = "^7.1.3"
+
+# Groups.
+[tool.poetry.group.pi]
+optional = true
 
 [tool.poetry.group.pi.dependencies]
 llama-cpp-python = { extras = ["server"], url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.69/llama_cpp_python-0.2.69-cp311-cp311-linux_aarch64.whl" }
