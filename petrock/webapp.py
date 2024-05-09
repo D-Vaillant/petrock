@@ -11,6 +11,23 @@ def index():
     return render_template('index.html', text_output= text_output, image_output=image_output)
 
 
+#Python functions
+def average_pixel_brightness(img):
+    
+    # Convert image to grayscale
+    img_gray = img.convert('L')
+    
+    # Get pixel data
+    pixels = img_gray.getdata()
+    
+    # Calculate average brightness
+    total_brightness = sum(pixels)
+    num_pixels = len(pixels)
+    average_brightness = total_brightness / num_pixels
+    
+    return average_brightness
+
+
 @app.route('/handle_input', methods=['POST'])
 def handle_input():
     global text_output
@@ -43,29 +60,5 @@ def handle_input():
 if __name__ == '__main__':
 	app.run(debug = True)
      
-
-
-#Python functions
-
-def average_pixel_brightness(img):
-    
-    # Convert image to grayscale
-    img_gray = img.convert('L')
-    
-    # Get pixel data
-    pixels = img_gray.getdata()
-    
-    # Calculate average brightness
-    total_brightness = sum(pixels)
-    num_pixels = len(pixels)
-    average_brightness = total_brightness / num_pixels
-    
-    return average_brightness
-
-
-
-
-
-
 
 
