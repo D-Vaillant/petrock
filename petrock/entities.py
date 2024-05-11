@@ -1,4 +1,6 @@
 from dataclasses import dataclass
+import logging
+
 import guidance
 from guidance import system, user, assistant, gen
 
@@ -38,6 +40,7 @@ class Entity:
             llm += prompt
         with assistant():
             llm += gen(max_tokens=500, name='response')
+        logging.info("Entity Response: {llm['response']}")
         return llm
 
 

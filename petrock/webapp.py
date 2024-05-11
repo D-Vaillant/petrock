@@ -46,7 +46,8 @@ def handle_input():
         file = request.files['file']
         img = Image.open(file)
         #example function
-        img_caption = petrock.vision.caption_image(img)
+        img_caption = 'A majestic sunrise.'
+        # img_caption = petrock.vision.caption_image(img)
 
     g.rock_response = prompt_petrock('React as if you had been presented with an image matching this caption.',
                                      img_caption)
