@@ -10,25 +10,20 @@
     
     <form action="/handle_input" method="POST" enctype="multipart/form-data">
 
-        <input type="text" id="input-data" name = 'text' placeholder="Enter data">
-        
+        <input type="text" id="input-data" name = 'text' placeholder="What do you want to say?">
         <div id="processed-data"></div>
 
 
         <input type="file" name="file">
         <div id="uploaded-image"></div>
 
-        <button id="process-data-btn">Process Data</button>
+        <button id="process-data-btn">Ask The Rock</button>
         
     </form>
 
     <div id = 'output' class='output'>
 
-        <p>{{ text_output}}</p>
-
-        <p>{{ image_output}}</p>
-
-
+        <p>{{ g.petrock_response }}</p>
 
     </div>
     

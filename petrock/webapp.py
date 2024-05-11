@@ -1,64 +1,41 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, g
 from PIL import Image
+from vision import caption_image
 
 app = Flask(__name__)
 
-text_output = "Enter Text"
-image_output = "Enter Image"
+text_output = "Prompt"
+image_output = "Image Upload / Webcam Upload"
+
+def caption_image(img: Image) -> str:
+    ...
+
+def prompt_petrock(text_input: str, img_caption: str) -> str:
+    
 #Home Page 
 @app.route('/')
 def index():
     return render_template('index.html', text_output= text_output, image_output=image_output)
 
 
-#Python functions
-def average_pixel_brightness(img):
-    
-    # Convert image to grayscale
-    img_gray = img.convert('L')
-    
-    # Get pixel data
-    pixels = img_gray.getdata()
-    
-    # Calculate average brightness
-    total_brightness = sum(pixels)
-    num_pixels = len(pixels)
-    average_brightness = total_brightness / num_pixels
-    
-    return average_brightness
-
-
 @app.route('/handle_input', methods=['POST'])
 def handle_input():
-    global text_output
-    global image_output
+    text_input = request.form.get('text', '')
 
-    #this handles the text input
-    if 'text' in request.form:
-         text = request.form['text']
-         text_output = f'Text length is {len(text)}'
-
-    else:
-         text_output = "No text input"
-
-    #This handles image input
     if 'file' in request.files:
-         file = request.files['file']
-         img = Image.open(file)
-         #example function
-         brightness = average_pixel_brightness(img)
-         image_output = f"The average pixel brightness is {brightness}"
+        file = request.files['file']
+        img = Image.open(file)
+        #example function
+        img_caption = caption_image(img)
+    
 
-    else:
-         image_output = 'No file part'
-    
-    
+    g.rock_response = prompt_petrock(text_input, img_caption)
     return redirect(url_for('index'))
 
 
 
 if __name__ == '__main__':
-	app.run(debug = True)
-     
+    app.run(debug = True)
+
 
 
