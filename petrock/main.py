@@ -3,9 +3,9 @@ import logging
 
 import guidance
 from guidance import system, user, assistant, gen
-from entities import Personality, Petrock
-from vision import Vision
-from llms import summon_llm
+from petrock.entities import Personality, Petrock
+from petrock.vision import Vision
+from petrock.llms import summon_llm
 
 rp_system = "Roleplay according to the description, without breaking character for any reason whatsoever. Answer briefly and only in dialogue. "
 

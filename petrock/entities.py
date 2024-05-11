@@ -1,11 +1,11 @@
 from dataclasses import dataclass
-import guidance
 from guidance import system, user, assistant, gen
 
 @dataclass
 class Personality:
     vibe: str
     purpose: str
+
 
 
 class Entity:
@@ -28,7 +28,6 @@ class Entity:
         # Overwrite this for your Entity subclasses.
         return ''
 
-    @guidance
     def chat(self, llm, prompt):
         with system():
             llm += self.rp_system

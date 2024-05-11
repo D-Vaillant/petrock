@@ -2,14 +2,13 @@ from flask import Flask, render_template, redirect, url_for, request, g
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
-from llms import summon_llm
-from vision import Vision
-from entities import Petrock
+from petrock.llms import summon_llm
+from petrock.vision import Vision
+from petrock.entities import Petrock
+
 
 app = Flask(__name__)
 
-text_output = "Prompt"
-image_output = "Image Upload / Webcam Upload"
 
 # TODO: Allow user input to change rock personality.
 petrock = Petrock(persona=('chill', 'making people laugh'),
@@ -32,12 +31,16 @@ def prompt_petrock(text_input: str, img_caption: str,
 #Home Page 
 @app.route('/')
 def index():
+    g.vibe = petrock.persona.vibe
+    g.purpose = petrock.persona.purpose
     return render_template('index.html', g=g)
 
 
 @app.route('/handle_input', methods=['POST'])
 def handle_input():
-    text_input = request.form.get('text', '')
+    g.vibe = petrock.persona.vibe
+    g.purpose = petrock.persona.purpose
+    # text_input = request.form.get('text', '')
 
     if 'file' in request.files:
         file = request.files['file']
@@ -45,7 +48,8 @@ def handle_input():
         #example function
         img_caption = petrock.vision.caption_image(img)
 
-    g.rock_response = prompt_petrock(text_input, img_caption)
+    g.rock_response = prompt_petrock('React as if you had been presented with an image matching this caption.',
+                                     img_caption)
     return redirect(url_for('index'))
 
 

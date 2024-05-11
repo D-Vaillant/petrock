@@ -1,6 +1,6 @@
 from PIL import Image
-import cv2
-from llms import summon_moondream
+# import cv2
+from petrock.llms import summon_moondream
 import openai
 
 
