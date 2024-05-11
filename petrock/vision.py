@@ -3,7 +3,7 @@ import cv2
 from llms import summon_moondream
 import openai
 
-#if webcam has error
+
 class Webcam:
     def get_image(self) -> Image:
         raise NotImplementedError("Webcam class must implement `get_image()` method.")
@@ -20,9 +20,11 @@ class OpenCVWebcam(Webcam):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         return Image.fromarray(frame)
 
+
 class Vision:
     def __init__(self, device: Webcam = None):
-        self.device = device or OpenCVWebcam()  # Default to OpenCVWebcam if no device is provided
+        # Default as None is fine - being blind is the default.
+        self.device = device
 
     # Future processing can be added here, such as resizing or filtering. currently raw image
     def process_webcam_input(self, raw_img: Image) -> Image:
@@ -60,11 +62,3 @@ class Vision:
         )
         caption = response['choices'][0]['text'] if response['choices'] else "No caption found."
         return caption
-
-if __name__ == "__main__":
-    vision = Vision()
-    try:
-        caption = vision.caption_image()
-        print(f"Generated Caption: {caption}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
