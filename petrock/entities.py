@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import guidance
 from guidance import system, user, assistant, gen
 
 @dataclass
@@ -7,10 +8,10 @@ class Personality:
     purpose: str
 
 
+rp_system = "Roleplay according to the description, without breaking character for any reason whatsoever. Answer briefly and only in dialogue. "
+
 
 class Entity:
-    rp_system = "Roleplay according to the description, without breaking character for any reason whatsoever. Answer briefly and only in dialogue. "
-
     def __init__(self, capacities: list=None,
                  **kwargs):
         if capacities is None:
@@ -28,15 +29,17 @@ class Entity:
         # Overwrite this for your Entity subclasses.
         return ''
 
-    def chat(self, llm, prompt):
+    @guidance
+    def chat(llm, self, prompt):
         with system():
-            llm += self.rp_system
+            llm += rp_system
             llm += self.system
         with user():
             llm += prompt
         with assistant():
             llm += gen(max_tokens=500, name='response')
         return llm
+
 
 class Petrock(Entity):
     def __init__(self, persona: Personality|tuple, *args, **kwargs):
