@@ -12,7 +12,7 @@ rp_system = "Roleplay according to the description, without breaking character f
 # Test capacity.
 class Echo:
     def echo(self):
-        print(self.__class__.__name__.upper())
+        logging.debug(f"ECHO: {self.__class__.__name__.upper()}")
 
 
 chill = Personality(vibe="relaxed", purpose="to be helpful and have a good time")

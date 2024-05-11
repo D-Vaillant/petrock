@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-
+import guidance
+from guidance import system, user, assistant, gen
 
 @dataclass
 class Personality:
@@ -8,20 +9,41 @@ class Personality:
 
 
 class Entity:
+    rp_system = "Roleplay according to the description, without breaking character for any reason whatsoever. Answer briefly and only in dialogue. "
+
     def __init__(self, capacities: list=None,
                  **kwargs):
         if capacities is None:
             return
         else:
             self.capacities = capacities
-        # Allows capacities to be invoked by an entity.
+        # Allows capacities to be utilized by an entity.
+        # e.g. e = Entity(capacities=[Vision(), Dance()])
+        # e.vision.do_vision(); e.dance.do_dance();
         for capacity in self.capacities:
             setattr(self, capacity.__class__.__name__.lower(), capacity)
 
+    @property
+    def system(self):
+        # Overwrite this for your Entity subclasses.
+        return ''
+
+    @guidance
+    def chat(self, llm, prompt):
+        with system():
+            llm += self.rp_system
+            llm += self.system
+        with user():
+            llm += prompt
+        with assistant():
+            llm += gen(max_tokens=500, name='response')
+        return llm
 
 class Petrock(Entity):
-    def __init__(self, persona: Personality, *args, **kwargs):
+    def __init__(self, persona: Personality|tuple, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if isinstance(persona, tuple):
+            persona = Personality(*persona)
         self.persona = persona
 
     @property
