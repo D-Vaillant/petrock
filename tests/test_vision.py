@@ -5,6 +5,8 @@ from PIL import Image
 
 from petrock.vision import Vision, OpenCVWebcam
 
+TESTING_WEBCAM: bool = False
+
 
 class TestCaptionImage(unittest.TestCase):
     test_imgs = ['images/cat.jpg', 'images/dog.jpg']
@@ -22,6 +24,7 @@ class TestCaptionImage(unittest.TestCase):
             self.assertIn(name, r)
 
 
+@unittest.skipUnless(TESTING_WEBCAM, "Not testing webcam functionality.")
 class TestRaspberryPiCamera(unittest.TestCase):
     def setUp(self):
         self.v = Vision(OpenCVWebcam())

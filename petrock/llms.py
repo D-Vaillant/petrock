@@ -37,8 +37,7 @@ def summon_llm(model_name, echo=False) -> models.OpenAI:
 
 def summon_moondream() -> OpenAI:
     # Returns an OpenAI model.
-    llm = OpenAI(model="moondream2",
-                 api_key='moondream',
+    llm = OpenAI(api_key='moondream',
                  tokenizer=tiktoken.get_encoding('cl100k_base'),
                  base_url=SERVER_URL)
     return llm
