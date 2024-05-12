@@ -1,9 +1,11 @@
 from PIL import Image
 import cv2
-from llms import summon_moondream
-import openai
+from petrock.llms import summon_moondream
+from openai import OpenAI
+import io
+import base64
+import requests
 
-#if webcam has error
 class Webcam:
     def get_image(self) -> Image:
         raise NotImplementedError("Webcam class must implement `get_image()` method.")
@@ -20,51 +22,67 @@ class OpenCVWebcam(Webcam):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         return Image.fromarray(frame)
 
+# Function to encode the image directly from a PIL Image object
+def encode_image_to_base64(img: Image) -> str:
+    buffered = io.BytesIO()
+    img.save(buffered, format="JPG")
+    return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+# Function to encode the image
+def encode_local_image(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
+def summon_moondream():
+    # Returns an initialized OpenAI object configured to communicate with your server
+    return OpenAI(api_key='moondream', base_url='http://localhost:8080/v1')
+
 class Vision:
-    def __init__(self, device: Webcam = None):
-        self.device = device or OpenCVWebcam()  # Default to OpenCVWebcam if no device is provided
+    #def __init__(self, webcam):
+   #     self.webcam = webcam
 
-    # Future processing can be added here, such as resizing or filtering. currently raw image
-    def process_webcam_input(self, raw_img: Image) -> Image:
-        return raw_img
-
-    #capture image and process it
-    def use_webcam(self, device: Webcam=None) -> Image:
-        if device is None:
-            if self.device is None:
-                raise Exception("Need to specify a webcam device.")
-            else:
-                device = self.device
-        raw_img = device.get_image()
-        baked_img = self.process_webcam_input(raw_img)
-        return baked_img
-    
-    #use moondream model to generate caption for the image.
-    def caption_image(self, img: Image) -> str:
-        #moondream = llms.summon_moondream()
-        # invoke Moondream here.
-        temp_image_path = "/tmp/captured_image.png"  # Save temp image
-        img.save(temp_image_path, format='PNG')
+    def get_caption(self, image_path):
+        # Capture image from webcam
+        #image = self.webcam.get_image()
+        # Encode image to base64
+        base64_image = encode_local_image(image_path)
         
-        # Upload the image as a file
-        image_file = openai.File.create(
-        file=open(temp_image_path, "rb"),
-        purpose="answers"
-        )
-
-        # Use the file ID to perform image captioning
-        response = openai.Image.create(
-            model="moondream",
-            file_id=image_file.id,
-            task="generate_image_caption"
-        )
-        caption = response['choices'][0]['text'] if response['choices'] else "No caption found."
-        return caption
+        # Prepare message for local model
+        moondream = summon_moondream()
+        response = moondream.chat.completions.create(
+            model="moondream2",
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                        "type": "text",
+                        "text": "What’s in this image?"
+                        },
+                        {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{base64_image}"
+                        }
+                        }
+                    ]
+                }
+            ],
+            max_tokens=300
+            )
+        # Extract the response
+        if 'choices' in response and response['choices']:
+            return response['choices'][0]['message']['content']
+        else:
+            return "No caption generated."
+    
+def test_vision_system():
+    # webcam = OpenCVWebcam()
+    vision = Vision()
+    image_path = '../images/cat.jpg'
+    #image = vision.use_webcam()
+    caption = vision.get_caption(image_path)
+    print("Image Caption:", caption)
 
 if __name__ == "__main__":
-    vision = Vision()
-    try:
-        caption = vision.caption_image()
-        print(f"Generated Caption: {caption}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    test_vision_system()
