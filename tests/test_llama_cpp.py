@@ -8,23 +8,27 @@ import unittest
 logging.basicConfig(level=logging.INFO)
 
 
+@unittest.skip('Part of model intelligence testing.')
 class ModelTester(unittest.TestCase):
     def setUp(self):
         model_zoo = get_model_zoo()
         mn = random.choice(list(model_zoo.keys()))
-        self.lm = models.LlamaCppChat(f"models/{model_zoo[mn]}",
+        self.lm = models.LlamaCppChat(f"{model_zoo[mn]['model']}",
                                       n_ctx=2048,
                                       echo=False)
         with system():
             self.lm += "Finish sentences accurately."
 
     def test_chat(self):
+        question = "What letter comes after Q?"
+        answer = 'R'
+        logging.info("Testing: {question}")
         with user():
-            lm = self.lm + "What letter comes after Q?"
+            lm = self.lm + question
         with assistant():
             lm += gen(stop='.', name='answer', max_tokens=50)
         logging.debug(f"Text state: {lm}")
-        self.assertEqual(lm['answer'].upper(), 'R')
+        self.assertEqual(lm['answer'].upper(), answer)
 
 
 
