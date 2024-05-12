@@ -13,13 +13,11 @@ einops = "^0.7.0"
 guidance = "^0.1.13"
 # for Raspberry Pi
 llama-cpp-python = [
-		{ platform = "aarch64", extras = ["server"], version = "^0.2.69"},
+		{ extras = ["server"], version = "^0.2.69"},
 		{ platform = "aarch64", extras = ["server"], url = "https://github.com/abetlen/llama-cpp-python/releases/download/v0.2.69/llama_cpp_python-0.2.69-cp311-cp311-linux_aarch64.whl" }
 		]
 flask = "^3.0.3"
 opencv-python-headless = "^4.9.0.80"
-
-
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.24.0"
