@@ -37,3 +37,6 @@ class TestRaspberryPiCamera(unittest.TestCase):
 class TestRandomWebcam(unittest.TestCase):
     ...
 
+
+if __name__ == "__main__":
+    unittest.main()
