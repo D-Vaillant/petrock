@@ -1,7 +1,3 @@
-from flask import Flask, render_template, request, jsonify
-from vision import Vision  
-import base64
-from io import BytesIO
 from PIL import Image
 import cv2
 from petrock.llms import summon_moondream
@@ -94,9 +90,7 @@ class Vision:
             raise k
 
 
-
-
-def test_vision_system():
+def test_webcam_captioning():
     vision = Vision(webcam=OpenCVWebcam())
     image = vision.webcam.get_image()
     caption = vision.caption_image(image)
