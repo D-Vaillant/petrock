@@ -1,15 +1,16 @@
-from petrock.models import model_zoo, ggufs
+from petrock.models import get_model_zoo
 from guidance import models, gen, select, user, assistant, system
 
 import logging
 import random
 import unittest
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 class ModelTester(unittest.TestCase):
     def setUp(self):
+        model_zoo = get_model_zoo()
         mn = random.choice(list(model_zoo.keys()))
         self.lm = models.LlamaCppChat(f"models/{model_zoo[mn]}",
                                       n_ctx=2048,

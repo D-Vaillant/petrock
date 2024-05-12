@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petrock!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="rock_desc">This petrock is {{ g.vibe }}; it's purpose is {{ g.purpose }}.</div>
+    <div class="container">
+        <!-- TODO: Make this a nice, big image that lets you click or drag an image. -->
+        <!-- TODO: Make a button that takes a webcam picture when you click it.-->
+        <div id="input_modalities"> <!-- Input modalities. -->
+        <div id="image_upload" class="pane">
+            <form action="/handle_input" method="POST" enctype="multipart/form-data">
+                <!-- <input type="text" id="input-data" name = 'text' placeholder="What do you want to say?"> -->
+                <input type="file" name="file">
+                <div id="uploaded-image"></div>
+                <button id="process-data-btn">Ask The Rock</button>
+            </form>
+        </div> <!-- End of image_upload. -->
+        <div id="webcam_capture", class="pane">
+
+        </div> <!-- End of webcam_capture. -->
+        </div> <!-- End of input modalities.-->
+        <!-- Output. -->
+        <div id='output' class='output'>
+            <p>{{ g.petrock_response }}</p>
+        </div>
+    </div>
+</body>
+</html>

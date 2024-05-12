@@ -1,4 +1,5 @@
 from PIL import Image
+
 import cv2
 from petrock.llms import summon_moondream
 from openai import OpenAI
@@ -22,11 +23,13 @@ class OpenCVWebcam(Webcam):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         return Image.fromarray(frame)
 
+
 # Function to encode the image directly from a PIL Image object
 def encode_image_to_base64(img: Image) -> str:
     buffered = io.BytesIO()
     img.save(buffered, format="JPG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
 
 # Function to encode the image
 def encode_local_image(image_path):

@@ -1,12 +1,32 @@
 # petrock
 Make your Raspberry Pi, into a pet rock. That can see.
 
-## Developer Setup
+## Installation
+You need `poetry`.
+
+Run:
+`poetry install`
+
+Then, to run the server:
+`poetry run ./server.sh`
+
+It's generally best to contain this in a `screen` or `tmux` pane that can be detached.
+
+### Developer Setup
 Use poetry.
 
 `poetry install --with=dev`
 
 Right now we're running `llama.cpp` with `guidance` as the LLM interface. `llama.cpp` should be installed with poetry.
+
+## Deployment
+
+### Raspberry Pi
+First, you need poetry and screen:
+`sudo apt install python3-poetry screen`
+
+Then:
+`poetry install --with=pi`
 
 ### Camera_setup, openCV, tensorflow lite
 
@@ -43,17 +63,6 @@ cv2.__version__
 
 //INSTALL COMPLETE! openCV v.4.9.0
 
-## Deployment
-This assumes you're using Raspbian Lite, circa 2024-05-01. Adjust parameters as you need.
-
-First, you need poetry:
-`sudo apt install python3-poetry`
-
-Then:
-`poetry install --with=pi`
-
-Run the script in `models` to download the models.
-This will set up the poetry virtual environment. To serve a WebUI, do TODO: WRITE THIS.
 
 ### Troubleshooting
 Sometimes you'll run into a DBus error when trying to use `poetry`. Do this, and `source ~/.bashrc`, and things should work properly.
