@@ -60,19 +60,18 @@ class Vision:
         response = moondream.chat.completions.create(
             model="moondream2",
             messages=[
+                {"role": "system", "content": "You are an assistant who perfectly describes images."},
                 {
                     "role": "user",
                     "content": [
-                        {
-                        "type": "text",
-                        "text": "What’s in this image?"
-                        },
-                        {
-                        "type": "image_url",
-                        "image_url": {
+                        {"type": "image_url",
+                         "image_url": {
                             "url": f"data:image/jpeg;base64,{base64_image}"
-                        }
-                        }
+                            },
+                        },
+                        {"type": "text",
+                        "text": "Describe this image in detail please."
+                        },
                     ]
                 }
             ],
