@@ -1,34 +1,29 @@
-from flask import Flask, render_template, request, jsonify
-from vision import Vision  
-import base64
-from io import BytesIO
 from PIL import Image
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
+import cv2
+from petrock.llms import summon_moondream
+from openai import OpenAI
+import io
+import base64
+import logging
 
 class Webcam:
-    def get_image(self) -> Image:
+    def get_image(self, save_path=None) -> Image:
         raise NotImplementedError("Webcam class must implement `get_image()` method.")
 
-#capture image from cam, using openCV and return as PIL Image.
 class OpenCVWebcam(Webcam):
-    def get_image(self) -> Image:
-        cap = cv2.VideoCapture(0)  # 0 is usually the default camera
+    def get_image(self, save_path=None) -> Image:
+        cap = cv2.VideoCapture(0)  # Use the first webcam
         success, frame = cap.read()
         cap.release()
         if not success:
             raise Exception("Failed to capture image")
-        # Convert the color from BGR to RGB
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        return Image.fromarray(frame)
+        image = Image.fromarray(frame)
+        if save_path:
+            image.save(save_path)
+        print("Using standard webcam via OpenCV.")
+        return image
 
-
-# Function to encode the image directly from a PIL Image object
 def encode_image_to_base64(img: Image) -> str:
     buffered = io.BytesIO()
     img.save(buffered, format="JPEG")
@@ -96,8 +91,7 @@ def test_vision_system():
     # webcam = OpenCVWebcam()
     vision = Vision()
     caption = vision.get_caption()
-
-    return jsonify({'caption': caption})
+    print("Image Caption:", caption)
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0')
+    test_vision_system()
