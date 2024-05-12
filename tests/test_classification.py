@@ -1,6 +1,6 @@
 # test_classification.py
 # Simply asks if a picture is a dog or a cat.
-from petrock.models import prompt_image
+# from petrock.models import prompt_image
 from PIL import Image
 import logging
 
