@@ -1,11 +1,14 @@
+from flask import Flask, render_template, request, jsonify
+from vision import Vision  
+import base64
+from io import BytesIO
 from PIL import Image
 
-import cv2
-import io
-import base64
-import logging
+app = Flask(__name__)
 
-from petrock.llms import summon_moondream
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 
 class Webcam:
@@ -92,10 +95,9 @@ class Vision:
 def test_vision_system():
     # webcam = OpenCVWebcam()
     vision = Vision()
-    image_path = 'images/cat.jpg'
-    #image = vision.use_webcam()
-    caption = vision.get_caption_from_image_path(image_path)
-    print("Image Caption:", caption)
+    caption = vision.get_caption()
+
+    return jsonify({'caption': caption})
 
 if __name__ == "__main__":
-    test_vision_system()
+    app.run(debug=True, host='0.0.0.0')
