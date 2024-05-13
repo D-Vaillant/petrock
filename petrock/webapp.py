@@ -28,6 +28,8 @@ def allowed_file(filename: str) -> bool:
 petrock = Petrock(persona=('chill', 'making people laugh'),
                   capacities=[Vision()])
 
+llm = summon_llm(model_name='llama3', echo=False)
+
 
 def prompt_petrock(text_input: str, img_caption: str,
                    **kwargs) -> str:
@@ -42,7 +44,6 @@ def prompt_petrock(text_input: str, img_caption: str,
     return llm_a['response']
 
 
-
 #Home Page 
 @app.route('/')
 def index():
@@ -51,7 +52,6 @@ def index():
     g.purpose = petrock.persona.purpose
     
     return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
-
 
 
 @app.route('/handle_capture', methods=['POST'])
@@ -63,20 +63,20 @@ def handle_capture():
     session['petrock_response'] = img_caption
     return jsonify({'caption': img_caption})
 
+
 @app.route('/capture', methods=['POST'])
 def capture():
     image_data = request.json['image']
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
+    logging.info("Beginning Petrock captioning.")
     caption = petrock.vision.caption_image(image)
     logging.info(f"caption: {caption}")
     return jsonify({'caption': caption})
 
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
-
-if __name__ == '__main__':
-    app.run(debug = True)
 
 
 
