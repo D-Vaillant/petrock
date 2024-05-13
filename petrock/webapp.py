@@ -1,9 +1,10 @@
 import io
 import base64
 import logging
+from pathlib import Path
 
 from flask import (Flask, render_template, redirect, url_for,
-                   request, g, jsonify)
+                   request, g, jsonify, session)
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
@@ -17,17 +18,15 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 app.secret_key = 'super_special_secret_key'
 
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'tiff'}
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+def allowed_file(filename: str) -> bool:
+    suffix = Path(filename).suffix.lstrip('.')
+    return suffix.lower() in ALLOWED_EXTENSIONS
 
 # TODO: Allow user input to change rock personality.
 petrock = Petrock(persona=('chill', 'making people laugh'),
                   capacities=[Vision()])
-
 
 
 def prompt_petrock(text_input: str, img_caption: str,
