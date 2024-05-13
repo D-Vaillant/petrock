@@ -1,12 +1,15 @@
-from flask import Flask, render_template, redirect, url_for, request, g, session, flash, jsonify
+import io
+import base64
+import logging
+
+from flask import (Flask, render_template, redirect, url_for,
+                   request, g, jsonify)
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
 from petrock.llms import summon_llm
 from petrock.vision import Vision
 from petrock.entities import Petrock
-import base64
-import io
 
 
 
