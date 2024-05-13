@@ -1,4 +1,9 @@
-from flask import Flask, render_template, redirect, url_for, request, g
+import io
+import base64
+import logging
+
+from flask import (Flask, render_template, redirect, url_for,
+                   request, g, jsonify)
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
@@ -6,6 +11,8 @@ from petrock.llms import summon_llm
 from petrock.vision import Vision
 from petrock.entities import Petrock
 
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -53,7 +60,17 @@ def handle_input():
                                      img_caption)
     return redirect(url_for('index'))
 
+@app.route('/capture', methods=['POST'])
+def capture():
+    image_data = request.json['image']
+    image_data = base64.b64decode(image_data.split(',')[1])
+    image = Image.open(io.BytesIO(image_data))
+    caption = petrock.vision.caption_image(image)
+    logging.info(f"caption: {caption}")
+    return jsonify({'caption': caption})
 
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0')
 
 if __name__ == '__main__':
     app.run(debug = True)
