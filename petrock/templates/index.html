@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petrock!</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div id="rock_desc">This petrock is {{ g.vibe }}; it's purpose is {{ g.purpose }}.</div>
@@ -29,5 +29,13 @@
             <p>{{ g.petrock_response }}</p>
         </div>
     </div>
+    <h1>Webcam Capture for PetRock</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="snap">Capture for the rock</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <p>This is the caption of your image with personality:</p>
+    <p id="caption"></p>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
