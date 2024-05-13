@@ -6,6 +6,7 @@ import io
 import base64
 import logging
 
+
 class Webcam:
     def get_image(self, save_path=None) -> Image:
         raise NotImplementedError("Webcam class must implement `get_image()` method.")
@@ -23,6 +24,7 @@ class OpenCVWebcam(Webcam):
             image.save(save_path)
         print("Using standard webcam via OpenCV.")
         return image
+
 
 def encode_image_to_base64(img: Image) -> str:
     buffered = io.BytesIO()
@@ -87,10 +89,11 @@ class Vision:
 
 
 
+
 def test_vision_system():
-    # webcam = OpenCVWebcam()
-    vision = Vision()
-    caption = vision.get_caption()
+    vision = Vision(webcam=OpenCVWebcam())
+    image = vision.webcam.get_image()
+    caption = vision.caption_image(image)
     print("Image Caption:", caption)
 
 if __name__ == "__main__":
