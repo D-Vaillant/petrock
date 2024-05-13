@@ -1,18 +1,29 @@
-from flask import Flask, render_template, redirect, url_for, request, g
+from flask import Flask, render_template, redirect, url_for, request, g, session, flash, jsonify
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
 from petrock.llms import summon_llm
 from petrock.vision import Vision
 from petrock.entities import Petrock
+import base64
+import io
+
 
 
 app = Flask(__name__)
+app.secret_key = 'super_special_secret_key'
+
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 # TODO: Allow user input to change rock personality.
 petrock = Petrock(persona=('chill', 'making people laugh'),
                   capacities=[Vision()])
+
 
 
 def prompt_petrock(text_input: str, img_caption: str,
@@ -27,31 +38,27 @@ def prompt_petrock(text_input: str, img_caption: str,
     llm_a = llm + petrock.chat(prompt)
     return llm_a['response']
 
-    
+
+
 #Home Page 
 @app.route('/')
 def index():
+    #petrock_response = session.get('petrock_response', None)
     g.vibe = petrock.persona.vibe
     g.purpose = petrock.persona.purpose
-    return render_template('index.html', g=g)
+    
+    return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
 
 
-@app.route('/handle_input', methods=['POST'])
-def handle_input():
-    g.vibe = petrock.persona.vibe
-    g.purpose = petrock.persona.purpose
-    # text_input = request.form.get('text', '')
 
-    if 'file' in request.files:
-        file = request.files['file']
-        img = Image.open(file)
-        #example function
-        img_caption = 'A majestic sunrise.'
-        # img_caption = petrock.vision.caption_image(img)
-
-    g.rock_response = prompt_petrock('React as if you had been presented with an image matching this caption.',
-                                     img_caption)
-    return redirect(url_for('index'))
+@app.route('/handle_capture', methods=['POST'])
+def handle_capture():
+    image_data = request.json['image']
+    image_data = base64.b64decode(image_data.split(',')[1])
+    image = Image.open(io.BytesIO(image_data))
+    img_caption = petrock.vision.caption_image(image)
+    session['petrock_response'] = img_caption
+    return jsonify({'caption': img_caption})
 
 
 
