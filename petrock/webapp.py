@@ -12,6 +12,7 @@ from petrock.vision import Vision
 from petrock.entities import Petrock
 
 
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 app.secret_key = 'super_special_secret_key'
@@ -63,7 +64,17 @@ def handle_capture():
     session['petrock_response'] = img_caption
     return jsonify({'caption': img_caption})
 
+@app.route('/capture', methods=['POST'])
+def capture():
+    image_data = request.json['image']
+    image_data = base64.b64decode(image_data.split(',')[1])
+    image = Image.open(io.BytesIO(image_data))
+    caption = petrock.vision.caption_image(image)
+    logging.info(f"caption: {caption}")
+    return jsonify({'caption': caption})
 
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0')
 
 if __name__ == '__main__':
     app.run(debug = True)
