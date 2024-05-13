@@ -7,27 +7,134 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="rock_desc">This petrock is {{ g.vibe }}; it's purpose is {{ g.purpose }}.</div>
+    
+    <div id="rock_desc">This petrock is {{ vibe }}; it's purpose is {{ purpose }}.</div>
     <div class="container">
-        <!-- TODO: Make this a nice, big image that lets you click or drag an image. -->
-        <!-- TODO: Make a button that takes a webcam picture when you click it.-->
+        
         <div id="input_modalities"> <!-- Input modalities. -->
-        <div id="image_upload" class="pane">
-            <form action="/handle_input" method="POST" enctype="multipart/form-data">
-                <!-- <input type="text" id="input-data" name = 'text' placeholder="What do you want to say?"> -->
-                <input type="file" name="file">
-                <div id="uploaded-image"></div>
-                <button id="process-data-btn">Ask The Rock</button>
-            </form>
+            <h1>Webcam Upload</h1>
+            <video id="video" autoplay></video>
+            <canvas id="canvas" width="640" height="480"></canvas>
+            
+            <input type="file" name = "upload" accept="image/*" id="fileInput" >
+            
+            
+            <button id="snap">Capture for the rock</button>
+        
+               
+            <button id="process">Ask The Rock</button>
         </div> <!-- End of image_upload. -->
-        <div id="webcam_capture", class="pane">
 
-        </div> <!-- End of webcam_capture. -->
-        </div> <!-- End of input modalities.-->
-        <!-- Output. -->
+             <!-- Output. -->
         <div id='output' class='output'>
-            <p>{{ g.petrock_response }}</p>
+            <!-- Flash error message if wrong file type is entered -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+            
+            <p id="caption"></p>
+            
         </div>
-    </div>
+
+    <script>
+        //starts webcam
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing webcam: ', err);
+            }
+        }
+    
+            const fileInput = document.getElementById('fileInput');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            //Displays selected local file to canvas 
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                           // const aspectRatio = img.width / img.height;
+                            // const height = 480 / aspectRatio;
+                            // canvas.width = 640;
+                            // canvas.height = 480;
+                            context.drawImage(img, 0, 0, 640, 480);
+                        };
+                        img.src = e.target.result;
+                    }
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+
+ 
+        
+
+        //Webcam image
+        const video = document.getElementById('video');
+        const snap = document.getElementById("snap");
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                video.srcObject = stream;
+            })
+            .catch((err) => {
+                console.error("[ERROR] Cannot access webcam:", err);
+            });
+        //displays webcam image on canvas 
+        snap.addEventListener("click", () => {
+            context.drawImage(video, 0, 0, 640, 480);
+        });
+
+
+        //sends image on canvas to flask
+        process.addEventListener("click", () => {
+            const captionText = document.getElementById("caption");
+            const imageData = canvas.toDataURL('image/jpeg');
+            
+            fetch('/handle_capture', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ image: imageData })
+            })
+
+            .then(response => response.json())
+                .then(data => {
+                    captionText.textContent = `Caption: ${data.caption}`;
+                 })
+
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+
+
+
+
+        // Start the webcam when the page loads
+        window.onload = startWebcam;
+    </script>
+  
+
+
+        </div> 
+       
+
 </body>
 </html>
