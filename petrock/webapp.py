@@ -10,8 +10,6 @@ from guidance import user, assistant, system, gen
 from petrock.llms import summon_llm
 from petrock.vision import Vision
 from petrock.entities import Petrock
-import base64
-import io
 
 
 
