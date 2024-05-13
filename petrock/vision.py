@@ -81,8 +81,7 @@ class Vision:
             logging.error("Key error when getting response", exc_info=True)
             return "Error in processing image."
 
-
-def test_vision_system():
+def test_webcam_captioning():
     vision = Vision(webcam=OpenCVWebcam())
     image = vision.webcam.get_image()
     caption = vision.caption_image(image)
