@@ -12,7 +12,6 @@ from petrock.vision import Vision
 from petrock.entities import Petrock
 
 
-
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
