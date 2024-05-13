@@ -26,9 +26,11 @@ class OpenCVWebcam(Webcam):
         return image
 
 
-def encode_image_to_base64(img: Image) -> str:
+# Function to encode the image directly from a PIL Image object
+def encode_image_to_base64(img: Image,
+                           file_ext: str='jpg') -> str:
     buffered = io.BytesIO()
-    img.save(buffered, format="JPEG")
+    img.save(buffered, format=file_ext.upper())
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 # Function to encode the image
@@ -39,7 +41,7 @@ def encode_local_image(image_path) -> str:
 
 class Vision:
     def __init__(self, webcam: Webcam=None):
-       self.webcam = webcam
+        self.webcam = webcam
 
     def caption_image(self, img: Image) -> str:
         base64_image = encode_image_to_base64(img)
@@ -97,4 +99,4 @@ def test_vision_system():
     print("Image Caption:", caption)
 
 if __name__ == "__main__":
-    test_vision_system()
+    test_webcam_captioning()
