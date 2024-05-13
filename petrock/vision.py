@@ -6,6 +6,7 @@ import io
 import base64
 import logging
 
+
 class Webcam:
     def get_image(self, save_path=None) -> Image:
         raise NotImplementedError("Webcam class must implement `get_image()` method.")
@@ -24,22 +25,32 @@ class OpenCVWebcam(Webcam):
         print("Using standard webcam via OpenCV.")
         return image
 
+
 def encode_image_to_base64(img: Image) -> str:
     buffered = io.BytesIO()
     img.save(buffered, format="JPEG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-def summon_moondream():
-    # Returns an initialized OpenAI object configured to communicate with your server
-    return OpenAI(api_key='moondream', base_url='http://localhost:8080/v1')
+# Function to encode the image
+def encode_local_image(image_path) -> str:
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode('utf-8')
+
 
 class Vision:
-    def __init__(self):
-        self.webcam = OpenCVWebcam()
+    def __init__(self, webcam: Webcam=None):
+       self.webcam = webcam
 
-    def get_caption(self, save_path="./tmp/captured_image.jpg"):
-        image = self.webcam.get_image(save_path=save_path)
-        base64_image = encode_image_to_base64(image)
+    def caption_image(self, img: Image) -> str:
+        base64_image = encode_image_to_base64(img)
+        caption = self.send_image_to_moondream(base64_image)
+        return caption
+
+    def get_caption_from_image_path(self, image_path):
+        # Capture image from webcam
+        #image = self.webcam.get_image()
+        # Encode image to base64
+        base64_image = encode_local_image(image_path)
         caption = self.send_image_to_moondream(base64_image)
         return caption
 
@@ -68,9 +79,11 @@ class Vision:
             logging.error("Key error when getting response", exc_info=True)
             return "Error in processing image."
 
+
 def test_vision_system():
-    vision = Vision()
-    caption = vision.get_caption()
+    vision = Vision(webcam=OpenCVWebcam())
+    image = vision.webcam.get_image()
+    caption = vision.caption_image(image)
     print("Image Caption:", caption)
 
 if __name__ == "__main__":
