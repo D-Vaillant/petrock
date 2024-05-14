@@ -56,11 +56,17 @@ def index():
 @app.route('/handle_caption', methods=['POST'])
 def handle_caption():
     image_data = request.json['image']
+    personality = request.json['personality']
+    logging.info(f"Selected personality: {personality}")
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
     img_caption = petrock.vision.caption_image(image)
+
+    session['petrock_response'] = img_caption
+
     logging.info(f"caption: {img_caption}")
-    return jsonify({'caption': img_caption})
+    return jsonify({'caption': img_caption, 'personality': personality})
+
 
 
 
