@@ -136,10 +136,9 @@
         //sends image on canvas to flask
       function fetchImageData(){
             const imageData = canvas.toDataURL('image/jpeg');
-
-            
-
             loadingGif.style.display = 'block';
+            captionText.textContent = "";
+            responseText.textContent = "";
             
             fetch('/handle_caption', {
                 method: 'POST',
@@ -154,7 +153,6 @@
                     captionText.textContent = `Caption: ${data.caption}`;
                     loadingGif.style.display = 'none';
                         //add fetch that sends caption to the server to get rock response
-
                        return fetch('/handle_response', {
                         method: 'POST',
                         headers: {

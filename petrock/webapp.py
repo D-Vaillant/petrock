@@ -16,6 +16,7 @@ from petrock.entities import Petrock
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+app.secret_key = "awdjaoiwjdioj3901u9"
 
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'tiff'}
