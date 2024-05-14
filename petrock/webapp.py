@@ -26,7 +26,7 @@ def allowed_file(filename: str) -> bool:
     return suffix.lower() in ALLOWED_EXTENSIONS
 
 # TODO: Allow user input to change rock personality.
-petrock = Petrock(persona=('chill', 'making people laugh'),
+petrock = Petrock(persona=('mean', 'making people laugh'),
                   capacities=[Vision()])
 
 llm = summon_llm(model_name='llama3', echo=False)
