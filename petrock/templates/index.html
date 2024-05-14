@@ -4,43 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petrock!</title>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/personality.js') }}"></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    
     <div id="rock_wall">
         <div id="rock_choices">
             <img src="{{ url_for('static', filename='images/cool.png') }}" alt="Cool" id="cool" class="personality-choice" onclick="selectPersonality('cool')">
             <img src="{{ url_for('static', filename='images/normal.png') }}" alt="Normal" id="normal" class="personality-choice selected" onclick="selectPersonality('normal')">
             <img src="{{ url_for('static', filename='images/angry.png') }}" alt="Angry" id="angry" class="personality-choice" onclick="selectPersonality('angry')">
-            
         </div>
-        <div id="rock_desc">This petrock is <span id="personality">normal</span>; its purpose is making people laugh.</div>
+        <div id="rock_desc">This petrock is <span id="personality">normal</span>; its purpose is <span id="purpose">respond plainly and normally.</span></div>
     </div>
     <div class="container">
-        
         <div id="input_modalities"> <!-- Input modalities. -->
-
-            <h1>Webcam Upload</h1>
-            <video id="video" autoplay></video>
-            <canvas id="canvas" width="640" height="480"></canvas>
-            
-
-
-            <input type="file" name = "upload" accept="image/*" id="fileInput" >
-            
-            <button id="snap">Capture for the rock</button>              
-            <button id="process">Ask The Rock</button>
-
-
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <h1>Webcam Upload</h1>
+                <button id="snap">Capture for the rock</button>
+            </div>
+            <div style="display: flex; gap: 20px;">
+                <video id="video" autoplay></video>
+                <canvas id="canvas" width="640" height="480"></canvas>
+            </div>
+            <div id="upload_box">
+                <h2>Or, upload a file:</h2>
+                <input type="file" name="upload" accept="image/*" id="fileInput"> 
+                <label for="fileInput">Choose File</label>
+                <button id="process">Ask The Rock</button>
+            </div>
         </div> <!-- End of image_upload. -->
 
-             <!-- Output. -->
-        <div id='output' class='output'>
+        <!-- Output. -->
+        <div id="output" class="output">
             <!-- Flash error message if wrong file type is entered -->
             {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul class=flashes>
+                <ul class="flashes">
                 {% for message in messages %}
                 <li>{{ message }}</li>
                 {% endfor %}
@@ -48,30 +47,13 @@
             {% endif %}
             {% endwith %}
             
-            <img id="loading" src="/static/rock.webp" alt="Loading..." style="display: none;" class="loading-gif" />
+            <img id="loading-caption" src="/static/rock.webp" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="caption"></p>
-
+            <img id="loading-response" src="/static/spinningrock.gif" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="response"></p>
-            
         </div>
-
+    </div>
     <script>
-              let selectedPersonality = 'normal';
-
-              function selectPersonality(personality) {
-                    selectedPersonality = personality;
-                    document.getElementById('personality').textContent = personality;
-
-                    const choices = document.querySelectorAll('.personality-choice');
-                    choices.forEach(choice => {
-                        if (choice.id === personality) {
-                            choice.classList.add('selected');
-                        } else {
-                            choice.classList.remove('selected');
-                        }
-                    });
-                }  
-
         //starts webcam
         async function startWebcam() {
             try {
@@ -83,13 +65,13 @@
             }
         }
     
-            const fileInput = document.getElementById('fileInput');
-            const canvas = document.getElementById('canvas');
-            const context = canvas.getContext('2d');
-            const captionText = document.getElementById("caption");
-            const responseText = document.getElementById("response");
-            const loadingGif = document.getElementById("loading");
-             
+        const fileInput = document.getElementById('fileInput');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const captionText = document.getElementById("caption");
+        const responseText = document.getElementById("response");
+        const loadingCaptionGif = document.getElementById("loading-caption");
+        const loadingResponseGif = document.getElementById("loading-response");     
 
         //Displays selected local file to canvas 
         fileInput.addEventListener('change', (event) => {
@@ -127,65 +109,58 @@
         //displays webcam image on canvas 
         snap.addEventListener("click", () => {
             context.drawImage(video, 0, 0, 640, 480);
-            
             fetchImageData();
     });
        
-
-
-        //sends image on canvas to flask
-      function fetchImageData(){
+    //sends image on canvas to flask
+    function fetchImageData(){
+        captionText.textContent = '';
+        responseText.textContent ='';
             const imageData = canvas.toDataURL('image/jpeg');
 
-            
+            loadingCaptionGif.style.display = 'block';
+            captionText.textContent = "";
+            responseText.textContent = "";
 
-            loadingGif.style.display = 'block';
-            
             fetch('/handle_caption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ image: imageData, personality: selectedPersonality })
+                body: JSON.stringify({ image: imageData  })
             })
 
             .then(response => response.json())
                 .then(data => {
                     captionText.textContent = `Caption: ${data.caption}`;
-                    loadingGif.style.display = 'none';
-                        //add fetch that sends caption to the server to get rock response
-
-                       return fetch('/handle_response', {
+                    loadingCaptionGif.style.display = 'none';
+                    //add fetch that sends caption to the server to get rock response
+                    loadingResponseGif.style.display = 'block';
+                    return fetch('/handle_response', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ caption: data.caption }) // Include caption data in the body
+                        body: JSON.stringify({ caption: data.caption,
+                            personality: document.querySelector('.selected').id
+                         }) // Include caption data in the body
                     });
                 })
                 .then(response => response.json())
                 .then(data => {
                     // Process the response of the second fetch request
                     responseText.textContent = `Response: ${data.responseText}`;
+                    loadingResponseGif.style.display = 'none';
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                     // Hide the loading GIF in case of an error
-                    loadingGif.style.display = 'none';
-                });
-                
+                    loadingCaptionGif.style.display = 'none';
+                    loadingResponseGif.style.display = 'none';
+                });      
         };
-    
-
-
         // Start the webcam when the page loads
         window.onload = startWebcam;
     </script>
-  
-
-
-        </div> 
-       
-
 </body>
 </html>

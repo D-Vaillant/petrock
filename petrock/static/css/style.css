@@ -4,11 +4,23 @@ body {
     padding: 20px;
 }
 
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#input_modalities {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Add padding between elements */
+}
+
 #video, #canvas {
-    margin-bottom: 10px;
-    display: block;
-    margin: 0 auto;
     background: #f0f0f0; /* Light gray background */
+    border: 1px solid #ccc; /* Optional: Add a border for better visibility */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better visibility */
 }
 
 #rock_choices {
@@ -42,9 +54,69 @@ body {
 
     /* Change location as needed */
     position: absolute;
-    top: 90%;
+    top: 100%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1;
 }
 
+/* Style for buttons */
+button, .file-input-wrapper {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover, .file-input-wrapper:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+button:active, .file-input-wrapper:active {
+    background-color: #004494;
+    transform: scale(1);
+}
+
+input[type="file"] {
+    display: none;
+}
+
+input[type="file"] + label {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+input[type="file"] + label:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+input[type="file"] + label:active {
+    background-color: #004494;
+    transform: scale(1);
+}
+
+#upload_box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
