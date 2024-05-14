@@ -8,7 +8,6 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    
     <div id="rock_wall">
         <div id="rock_choices">
             <img src="{{ url_for('static', filename='images/cool.png') }}" alt="Cool" id="cool" class="personality-choice" onclick="selectPersonality('cool')">
@@ -21,22 +20,15 @@
     <div class="container">
         
         <div id="input_modalities"> <!-- Input modalities. -->
-
             <h1>Webcam Upload</h1>
             <video id="video" autoplay></video>
             <canvas id="canvas" width="640" height="480"></canvas>
-            
-
-
-            <input type="file" name = "upload" accept="image/*" id="fileInput" >
-            
+            <input type="file" name = "upload" accept="image/*" id="fileInput" > 
             <button id="snap">Capture for the rock</button>              
             <button id="process">Ask The Rock</button>
-
-
         </div> <!-- End of image_upload. -->
 
-             <!-- Output. -->
+        <!-- Output. -->
         <div id='output' class='output'>
             <!-- Flash error message if wrong file type is entered -->
             {% with messages = get_flashed_messages() %}
@@ -53,7 +45,6 @@
             <p id="caption"></p>
             <img id="loading-response" src="/static/spinningrock.gif" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="response"></p>
-            
         </div>
 
     <script>
@@ -119,19 +110,16 @@
             fetchImageData();
     });
        
-
-
-        //sends image on canvas to flask
-      function fetchImageData(){
+    //sends image on canvas to flask
+    function fetchImageData(){
         captionText.textContent = '';
         responseText.textContent ='';
             const imageData = canvas.toDataURL('image/jpeg');
 
-            loadingGif.style.display = 'block';
+            loadingCaptionGif.style.display = 'block';
             captionText.textContent = "";
             responseText.textContent = "";
 
-            
             fetch('/handle_caption', {
                 method: 'POST',
                 headers: {
@@ -144,11 +132,9 @@
                 .then(data => {
                     captionText.textContent = `Caption: ${data.caption}`;
                     loadingCaptionGif.style.display = 'none';
-                        //add fetch that sends caption to the server to get rock response
-
-
-                        loadingResponseGif.style.display = 'block';
-                       return fetch('/handle_response', {
+                    //add fetch that sends caption to the server to get rock response
+                    loadingResponseGif.style.display = 'block';
+                    return fetch('/handle_response', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
