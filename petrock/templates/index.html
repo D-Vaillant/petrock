@@ -20,14 +20,19 @@
     <div class="container">
         
         <div id="input_modalities"> <!-- Input modalities. -->
+
             <h1>Webcam Upload</h1>
             <video id="video" autoplay></video>
             <canvas id="canvas" width="640" height="480"></canvas>
             
+
+
             <input type="file" name = "upload" accept="image/*" id="fileInput" >
             
             <button id="snap">Capture for the rock</button>              
             <button id="process">Ask The Rock</button>
+
+
         </div> <!-- End of image_upload. -->
 
              <!-- Output. -->
@@ -43,7 +48,10 @@
             {% endif %}
             {% endwith %}
             
+            <img id="loading" src="/static/rock.webp" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="caption"></p>
+
+            <p id="response"></p>
             
         </div>
 
@@ -78,32 +86,31 @@
             const fileInput = document.getElementById('fileInput');
             const canvas = document.getElementById('canvas');
             const context = canvas.getContext('2d');
+            const captionText = document.getElementById("caption");
+            const responseText = document.getElementById("response");
+            const loadingGif = document.getElementById("loading");
+             
 
-            //Displays selected local file to canvas 
-            fileInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
+        //Displays selected local file to canvas 
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
                 
-                if (file) {
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(e) {
-                        const img = new Image();
-                        img.onload = function() {
-                           // const aspectRatio = img.width / img.height;
-                            // const height = 480 / aspectRatio;
-                            // canvas.width = 640;
-                            // canvas.height = 480;
-                            context.drawImage(img, 0, 0, 640, 480);
-                        };
-                        img.src = e.target.result;
-                    }
-                    
-                    reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        context.drawImage(img, 0, 0, 640, 480);
+                        fetchImageData();
+                    };
+                    img.src = e.target.result;
                 }
-            });
-
- 
-        
+                
+                reader.readAsDataURL(file);
+            }     
+            
+        });
 
         //Webcam image
         const video = document.getElementById('video');
@@ -116,18 +123,25 @@
             .catch((err) => {
                 console.error("[ERROR] Cannot access webcam:", err);
             });
+
         //displays webcam image on canvas 
         snap.addEventListener("click", () => {
             context.drawImage(video, 0, 0, 640, 480);
-        });
+            
+            fetchImageData();
+    });
+       
 
 
         //sends image on canvas to flask
-        process.addEventListener("click", () => {
-            const captionText = document.getElementById("caption");
-            const imageData = canvas.toDataURL('image/jpeg');;
+      function fetchImageData(){
+            const imageData = canvas.toDataURL('image/jpeg');
+
             
-            fetch('/handle_capture', {
+
+            loadingGif.style.display = 'block';
+            
+            fetch('/handle_caption', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,14 +152,30 @@
             .then(response => response.json())
                 .then(data => {
                     captionText.textContent = `Caption: ${data.caption}`;
-                 })
+                    loadingGif.style.display = 'none';
+                        //add fetch that sends caption to the server to get rock response
 
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-        });
-
-
+                       return fetch('/handle_response', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ caption: data.caption }) // Include caption data in the body
+                    });
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Process the response of the second fetch request
+                    responseText.textContent = `Response: ${data.responseText}`;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    // Hide the loading GIF in case of an error
+                    loadingGif.style.display = 'none';
+                });
+                
+        };
+    
 
 
         // Start the webcam when the page loads
