@@ -1,8 +1,13 @@
-#!/bin/sh
-# Best to run this in a screen/tmux window.
+#!/bin/bash
 
-python -m llama_cpp.server --config petrock/server_config.json
+export FLASK_APP=petrock/webapp.py
+# export FLASK_ENV=development
 
-export FLASK_APP=app.py
-export FLASK_ENV=development
-poetry run flask run --host=0.0.0.0
+# Create a new screen session
+screen -dmS petrock
+
+screen -S petrock -X screen -d -m -t "flask" flask run
+screen -S petrock -X screen -d -m -t "llama" python -m llama_cpp.server --config petrock/server_config.json
+
+# Attach to the screen session
+screen -r petrock
