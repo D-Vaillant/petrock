@@ -35,7 +35,6 @@ def prompt_petrock(text_input: str, img_caption: str,
                    **kwargs) -> str:
     # TODO: Construct the prompt to the VLM.
     model = kwargs.get('model', 'llama3')
-    llm = summon_llm(model)
     # We start with returning the whole thing at once.
     # Then we can tackle streaming.
     # get some guidance program
@@ -52,7 +51,6 @@ def index():
     g.purpose = petrock.persona.purpose
     
     return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
-
 
 
 @app.route('/handle_caption', methods=['POST'])
