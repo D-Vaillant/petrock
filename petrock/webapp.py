@@ -16,7 +16,7 @@ from petrock.entities import Petrock
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = 'super_special_secret_key'
+
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'tiff'}
 
@@ -35,7 +35,6 @@ def prompt_petrock(text_input: str, img_caption: str,
                    **kwargs) -> str:
     # TODO: Construct the prompt to the VLM.
     model = kwargs.get('model', 'llama3')
-    llm = summon_llm(model)
     # We start with returning the whole thing at once.
     # Then we can tackle streaming.
     # get some guidance program
@@ -54,31 +53,35 @@ def index():
     return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
 
 
-@app.route('/handle_capture', methods=['POST'])
-def handle_capture():
+@app.route('/handle_caption', methods=['POST'])
+def handle_caption():
     image_data = request.json['image']
     personality = request.json['personality']
     logging.info(f"Selected personality: {personality}")
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
     img_caption = petrock.vision.caption_image(image)
+
     session['petrock_response'] = img_caption
+
+    logging.info(f"caption: {img_caption}")
     return jsonify({'caption': img_caption, 'personality': personality})
 
 
-@app.route('/capture', methods=['POST'])
-def capture():
-    image_data = request.json['image']
-    image_data = base64.b64decode(image_data.split(',')[1])
-    image = Image.open(io.BytesIO(image_data))
-    logging.info("Beginning Petrock captioning.")
-    caption = petrock.vision.caption_image(image)
-    logging.info(f"caption: {caption}")
-    return jsonify({'caption': caption})
 
+
+@app.route('/handle_response', methods=['POST'])
+def handle_response():
+    data = request.json  
+    caption = data.get('caption')
+    prompt = "React to this caption as if you had seen an image."
+    response = prompt_petrock(prompt, caption)
+    return jsonify({'responseText' : response})
+ 
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
+
 
 
 

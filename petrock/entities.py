@@ -40,7 +40,7 @@ class Entity:
             llm += prompt
         with assistant():
             llm += gen(max_tokens=500, name='response')
-        logging.info("Entity Response: {llm['response']}")
+        logging.info(f"Entity Response: {llm['response']}")
         return llm
 
 
