@@ -13,27 +13,33 @@
             <img src="{{ url_for('static', filename='images/cool.png') }}" alt="Cool" id="cool" class="personality-choice" onclick="selectPersonality('cool')">
             <img src="{{ url_for('static', filename='images/normal.png') }}" alt="Normal" id="normal" class="personality-choice selected" onclick="selectPersonality('normal')">
             <img src="{{ url_for('static', filename='images/angry.png') }}" alt="Angry" id="angry" class="personality-choice" onclick="selectPersonality('angry')">
-            
         </div>
         <div id="rock_desc">This petrock is <span id="personality">normal</span>; its purpose is <span id="purpose">respond plainly and normally.</span></div>
     </div>
     <div class="container">
-        
         <div id="input_modalities"> <!-- Input modalities. -->
-            <h1>Webcam Upload</h1>
-            <video id="video" autoplay></video>
-            <canvas id="canvas" width="640" height="480"></canvas>
-            <input type="file" name = "upload" accept="image/*" id="fileInput" > 
-            <button id="snap">Capture for the rock</button>              
-            <button id="process">Ask The Rock</button>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <h1>Webcam Upload</h1>
+                <button id="snap">Capture for the rock</button>
+            </div>
+            <div style="display: flex; gap: 20px;">
+                <video id="video" autoplay></video>
+                <canvas id="canvas" width="640" height="480"></canvas>
+            </div>
+            <div id="upload_box">
+                <h2>Or, upload a file:</h2>
+                <input type="file" name="upload" accept="image/*" id="fileInput"> 
+                <label for="fileInput">Choose File</label>
+                <button id="process">Ask The Rock</button>
+            </div>
         </div> <!-- End of image_upload. -->
 
         <!-- Output. -->
-        <div id='output' class='output'>
+        <div id="output" class="output">
             <!-- Flash error message if wrong file type is entered -->
             {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <ul class=flashes>
+                <ul class="flashes">
                 {% for message in messages %}
                 <li>{{ message }}</li>
                 {% endfor %}
@@ -46,7 +52,7 @@
             <img id="loading-response" src="/static/spinningrock.gif" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="response"></p>
         </div>
-
+    </div>
     <script>
         //starts webcam
         async function startWebcam() {
@@ -156,11 +162,5 @@
         // Start the webcam when the page loads
         window.onload = startWebcam;
     </script>
-  
-
-
-        </div> 
-       
-
 </body>
 </html>
