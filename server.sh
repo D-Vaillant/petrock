@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export FLASK_APP=petrock/webapp.py
 # export FLASK_ENV=development
 
 # Create a new screen session
