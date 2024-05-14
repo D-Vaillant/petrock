@@ -43,9 +43,9 @@
             {% endif %}
             {% endwith %}
             
-            <img id="loading" src="/static/rock.webp" alt="Loading..." style="display: none;" class="loading-gif" />
+            <img id="loading-caption" src="/static/rock.webp" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="caption"></p>
-
+            <img id="loading-response" src="/static/spinningrock.gif" alt="Loading..." style="display: none;" class="loading-gif" />
             <p id="response"></p>
             
         </div>
@@ -67,7 +67,8 @@
             const context = canvas.getContext('2d');
             const captionText = document.getElementById("caption");
             const responseText = document.getElementById("response");
-            const loadingGif = document.getElementById("loading");
+            const loadingCaptionGif = document.getElementById("loading-caption");
+            const loadingResponseGif = document.getElementById("loading-response");
              
 
         //Displays selected local file to canvas 
@@ -116,10 +117,12 @@
 
         //sends image on canvas to flask
       function fetchImageData(){
+        captionText.textContent = '';
+        responseText.textContent ='';
             const imageData = canvas.toDataURL('image/jpeg');
             
 
-            loadingGif.style.display = 'block';
+            loadingCaptionGif.style.display = 'block';
             
             fetch('/handle_caption', {
                 method: 'POST',
@@ -132,9 +135,10 @@
             .then(response => response.json())
                 .then(data => {
                     captionText.textContent = `Caption: ${data.caption}`;
-                    loadingGif.style.display = 'none';
+                    loadingCaptionGif.style.display = 'none';
                         //add fetch that sends caption to the server to get rock response
 
+                        loadingResponseGif.style.display = 'block';
                        return fetch('/handle_response', {
                         method: 'POST',
                         headers: {
@@ -147,11 +151,13 @@
                 .then(data => {
                     // Process the response of the second fetch request
                     responseText.textContent = `Response: ${data.responseText}`;
+                    loadingResponseGif.style.display = 'none';
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                     // Hide the loading GIF in case of an error
-                    loadingGif.style.display = 'none';
+                    loadingCaptionGif.style.display = 'none';
+                    loadingResponseGif.style.display = 'none';
                 });
                 
         };
