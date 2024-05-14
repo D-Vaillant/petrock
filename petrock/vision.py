@@ -28,7 +28,9 @@ class OpenCVWebcam(Webcam):
 
 # Function to encode the image directly from a PIL Image object
 def encode_image_to_base64(img: Image,
+
                            file_ext: str='JPEG') -> str:
+
     buffered = io.BytesIO()
     if file_ext.upper() == 'JPG':
         file_ext = 'JPEG'

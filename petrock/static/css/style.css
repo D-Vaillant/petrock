@@ -14,3 +14,16 @@ body{
 #video, #canvas {
     margin-bottom: 10px;
 }
+
+.loading-gif {
+    /* Change size as needed */
+    width: 200px;
+    height: 150px;
+
+    /* Change location as needed */
+    position: absolute;
+    top: 90%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
