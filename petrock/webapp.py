@@ -1,9 +1,10 @@
 import io
 import base64
 import logging
+from pathlib import Path
 
 from flask import (Flask, render_template, redirect, url_for,
-                   request, g, jsonify)
+                   request, g, jsonify, session)
 from PIL import Image
 import guidance
 from guidance import user, assistant, system, gen
@@ -12,23 +13,22 @@ from petrock.vision import Vision
 from petrock.entities import Petrock
 
 
-
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
 
-ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'tiff'}
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+def allowed_file(filename: str) -> bool:
+    suffix = Path(filename).suffix.lstrip('.')
+    return suffix.lower() in ALLOWED_EXTENSIONS
 
 # TODO: Allow user input to change rock personality.
 petrock = Petrock(persona=('chill', 'making people laugh'),
                   capacities=[Vision()])
 
+llm = summon_llm(model_name='llama3', echo=False)
 
 
 def prompt_petrock(text_input: str, img_caption: str,
@@ -42,7 +42,6 @@ def prompt_petrock(text_input: str, img_caption: str,
     prompt = f"Caption: {img_caption}\n{text_input}."
     llm_a = llm + petrock.chat(prompt)
     return llm_a['response']
-
 
 
 #Home Page 
@@ -66,12 +65,13 @@ def handle_caption():
     return jsonify({'caption': img_caption})
 
 
+
 @app.route('/handle_response', methods=['POST'])
 def handle_response():
     data = request.json  
     caption = data.get('caption')
 
-    return jsonify({'responseText' : "Respones"})
+    return jsonify({'responseText' : "Response"})
  
 
 

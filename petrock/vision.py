@@ -28,8 +28,12 @@ class OpenCVWebcam(Webcam):
 
 # Function to encode the image directly from a PIL Image object
 def encode_image_to_base64(img: Image,
-                           file_ext: str='jpeg') -> str:
+
+                           file_ext: str='JPEG') -> str:
+
     buffered = io.BytesIO()
+    if file_ext.upper() == 'JPG':
+        file_ext = 'JPEG'
     img.save(buffered, format=file_ext.upper())
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
@@ -55,9 +59,8 @@ class Vision:
         base64_image = encode_local_image(image_path)
         caption = self.send_image_to_moondream(base64_image)
         return caption
-        
+
     def send_image_to_moondream(self, base64_image):
-        # Prepare message for local model
         moondream = summon_moondream()
         response = moondream.chat.completions.create(
             model="moondream2",
@@ -66,33 +69,23 @@ class Vision:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "image_url",
-                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{base64_image}"
-                            },
-                        },
-                        {"type": "text",
-                        "text": "Describe this image in detail please."
-                        },
+                        {"type": "text", "text": "What is in this image?"},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
                     ]
                 }
             ],
             max_tokens=300
-            )
-        # Extract the response
+        )
         try:
             return response.choices[0].message.content
         except IndexError as e:
-            logging.fatal("Index error when getting response")
-            raise e
+            logging.error("Index error when getting response", exc_info=True)
+            return "Error in processing image."
         except KeyError as k:
-            logging.fatal("Key error when getting response")
-            raise k
+            logging.error("Key error when getting response", exc_info=True)
+            return "Error in processing image."
 
-
-
-
-def test_vision_system():
+def test_webcam_captioning():
     vision = Vision(webcam=OpenCVWebcam())
     image = vision.webcam.get_image()
     caption = vision.caption_image(image)

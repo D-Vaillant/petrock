@@ -57,3 +57,6 @@ class Petrock(Entity):
         out = [f"You are a {persona.vibe} pet rock. ",
                 f"Your purpose for existing is {persona.purpose}."]
         return '\n'.join(out)
+    
+    def set_persona(self, vibe, purpose):
+        self.persona = Personality(vibe=vibe, purpose=purpose)
