@@ -16,7 +16,7 @@ from petrock.entities import Petrock
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
-app.secret_key = 'super_special_secret_key'
+
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg'}
 
@@ -56,29 +56,29 @@ def index():
 
 
 
-@app.route('/handle_capture', methods=['POST'])
-def handle_capture():
+@app.route('/handle_caption', methods=['POST'])
+def handle_caption():
     image_data = request.json['image']
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
     img_caption = petrock.vision.caption_image(image)
-    session['petrock_response'] = img_caption
+    logging.info(f"caption: {img_caption}")
     return jsonify({'caption': img_caption})
 
-@app.route('/capture', methods=['POST'])
-def capture():
-    image_data = request.json['image']
-    image_data = base64.b64decode(image_data.split(',')[1])
-    image = Image.open(io.BytesIO(image_data))
-    caption = petrock.vision.caption_image(image)
-    logging.info(f"caption: {caption}")
-    return jsonify({'caption': caption})
+
+@app.route('/handle_response', methods=['POST'])
+def handle_response():
+    data = request.json  
+    caption = data.get('caption')
+
+    return jsonify({'responseText' : "Respones"})
+ 
+
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
 
-if __name__ == '__main__':
-    app.run(debug = True)
 
 
 
