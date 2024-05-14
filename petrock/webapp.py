@@ -68,11 +68,10 @@ def handle_caption():
 def handle_response():
     data = request.json  
     caption = data.get('caption')
-
-    return jsonify({'responseText' : "Response"})
+    prompt = "React to this caption as if you had seen an image."
+    response = prompt_petrock(prompt, caption)
+    return jsonify({'responseText' : response})
  
-
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')
