@@ -69,7 +69,7 @@ class Vision:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "What is in this image?"},
+                        {"type": "text", "text": "What is in this image? Be brief."},
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
                     ]
                 }
