@@ -47,6 +47,10 @@ body {
     margin-bottom: 20px;
 }
 
+.personality-choice {
+    width: 100px;
+}
+
 .loading-gif {
     /* Change size as needed */
     width: 200px;

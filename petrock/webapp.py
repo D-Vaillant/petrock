@@ -16,6 +16,7 @@ from petrock.entities import Petrock
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
+app.secret_key = "awdjaoiwjdioj3901u9"
 
 
 ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'tiff'}
@@ -25,7 +26,13 @@ def allowed_file(filename: str) -> bool:
     return suffix.lower() in ALLOWED_EXTENSIONS
 
 # TODO: Allow user input to change rock personality.
-petrock = Petrock(persona=('chill', 'making people laugh'),
+personas = {
+    'cool': ('chill', 'wax philosophical about nonsense'),
+    'normal': ('boring', 'respond plainly and normally'),
+    'angry': ('irritable', 'be rude for no reason')
+}
+
+petrock = Petrock(persona=('normal', 'act normally'),
                   capacities=[Vision()])
 
 llm = summon_llm(model_name='llama3', echo=False)
@@ -49,15 +56,12 @@ def index():
     #petrock_response = session.get('petrock_response', None)
     g.vibe = petrock.persona.vibe
     g.purpose = petrock.persona.purpose
-    
     return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
 
 
 @app.route('/handle_caption', methods=['POST'])
 def handle_caption():
     image_data = request.json['image']
-    personality = request.json['personality']
-    logging.info(f"Selected personality: {personality}")
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
     img_caption = petrock.vision.caption_image(image)
@@ -65,16 +69,19 @@ def handle_caption():
     session['petrock_response'] = img_caption
 
     logging.info(f"caption: {img_caption}")
-    return jsonify({'caption': img_caption, 'personality': personality})
-
-
+    return jsonify({'caption': img_caption })
 
 
 @app.route('/handle_response', methods=['POST'])
 def handle_response():
     data = request.json  
+
     caption = data.get('caption')
+    personality = data.get('personality', 'normal')
+    logging.info(f"Selected personality: {personality}")
+
     prompt = "React to this caption as if you had seen an image."
+    petrock.set_persona(*personas[personality])
     response = prompt_petrock(prompt, caption)
     return jsonify({'responseText' : response})
  
