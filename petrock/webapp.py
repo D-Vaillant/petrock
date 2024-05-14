@@ -26,7 +26,13 @@ def allowed_file(filename: str) -> bool:
     return suffix.lower() in ALLOWED_EXTENSIONS
 
 # TODO: Allow user input to change rock personality.
-petrock = Petrock(persona=('mean', 'making people laugh'),
+personas = {
+    'cool': ('chill', 'wax philosophical about nonsense'),
+    'normal': ('boring', 'respond plainly and normally'),
+    'angry': ('irritable', 'be rude for no reason')
+}
+
+petrock = Petrock(persona=('normal', 'act normally'),
                   capacities=[Vision()])
 
 llm = summon_llm(model_name='llama3', echo=False)
@@ -64,6 +70,7 @@ def handle_caption():
     img_caption = petrock.vision.caption_image(image)
 
     session['petrock_response'] = img_caption
+    petrock.set_persona(*personas[personality])
 
     logging.info(f"caption: {img_caption}")
     return jsonify({'caption': img_caption, 'personality': personality})
