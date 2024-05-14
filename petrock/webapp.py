@@ -56,33 +56,32 @@ def index():
     #petrock_response = session.get('petrock_response', None)
     g.vibe = petrock.persona.vibe
     g.purpose = petrock.persona.purpose
-    
     return render_template('index.html', vibe = g.vibe, purpose = g.purpose)
 
 
 @app.route('/handle_caption', methods=['POST'])
 def handle_caption():
     image_data = request.json['image']
-    personality = request.json['personality']
-    logging.info(f"Selected personality: {personality}")
     image_data = base64.b64decode(image_data.split(',')[1])
     image = Image.open(io.BytesIO(image_data))
     img_caption = petrock.vision.caption_image(image)
 
     session['petrock_response'] = img_caption
-    petrock.set_persona(*personas[personality])
 
     logging.info(f"caption: {img_caption}")
-    return jsonify({'caption': img_caption, 'personality': personality})
-
-
+    return jsonify({'caption': img_caption })
 
 
 @app.route('/handle_response', methods=['POST'])
 def handle_response():
     data = request.json  
+
     caption = data.get('caption')
+    personality = data.get('personality', 'normal')
+    logging.info(f"Selected personality: {personality}")
+
     prompt = "React to this caption as if you had seen an image."
+    petrock.set_persona(*personas[personality])
     response = prompt_petrock(prompt, caption)
     return jsonify({'responseText' : response})
  

@@ -48,8 +48,6 @@
         </div>
 
     <script>
-        let selectedPersonality = 'normal';
-
         //starts webcam
         async function startWebcam() {
             try {
@@ -67,8 +65,7 @@
         const captionText = document.getElementById("caption");
         const responseText = document.getElementById("response");
         const loadingCaptionGif = document.getElementById("loading-caption");
-        const loadingResponseGif = document.getElementById("loading-response");
-             
+        const loadingResponseGif = document.getElementById("loading-response");     
 
         //Displays selected local file to canvas 
         fileInput.addEventListener('change', (event) => {
@@ -106,7 +103,6 @@
         //displays webcam image on canvas 
         snap.addEventListener("click", () => {
             context.drawImage(video, 0, 0, 640, 480);
-            
             fetchImageData();
     });
        
@@ -125,7 +121,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ image: imageData, personality: selectedPersonality })
+                body: JSON.stringify({ image: imageData  })
             })
 
             .then(response => response.json())
@@ -139,7 +135,9 @@
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ caption: data.caption }) // Include caption data in the body
+                        body: JSON.stringify({ caption: data.caption,
+                            personality: document.querySelector('.selected').id
+                         }) // Include caption data in the body
                     });
                 })
                 .then(response => response.json())
@@ -153,12 +151,8 @@
                     // Hide the loading GIF in case of an error
                     loadingCaptionGif.style.display = 'none';
                     loadingResponseGif.style.display = 'none';
-                });
-                
+                });      
         };
-    
-
-
         // Start the webcam when the page loads
         window.onload = startWebcam;
     </script>
