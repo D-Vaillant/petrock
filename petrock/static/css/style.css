@@ -1,18 +1,38 @@
-h1 {
-    border: 2px #eee solid;
-    color: brown;
-    text-align: center;
-    padding: 10px;
-}
-
-body{
+body {
+    font-family: Arial, sans-serif;
     text-align: center;
     padding: 20px;
-    font-family: Arial, sans-serif;
 }
 
 #video, #canvas {
     margin-bottom: 10px;
+    display: block;
+    margin: 0 auto;
+    background: #f0f0f0; /* Light gray background */
+}
+
+#rock_choices {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.personality-choice {
+    width: 100px;  /* Adjust size as needed */
+    height: 100px; /* Adjust size as needed */
+    margin: 0 10px;
+    cursor: pointer;
+    border: 3px solid transparent;
+    border-radius: 15px;
+    transition: border-color 0.3s;
+}
+
+.personality-choice.selected {
+    border-color: orange;
+}
+
+#rock_desc {
+    margin-bottom: 20px;
 }
 
 .personality-choice {
@@ -31,3 +51,4 @@ body{
     transform: translate(-50%, -50%);
     z-index: 1;
 }
+
